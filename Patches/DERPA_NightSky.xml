@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+    <!--
+      Darken outdoor nights. Night glow is already ~0 (measured), so what you SEE
+      at night is the night sky COLOUR painting the lighting overlay
+      (SkyManagerUpdate: MatBases.LightOverlay.color = curSky.colors.sky), not a
+      light level. So the lever is the <sky> colour in the night blocks:
+        skyColorsNightMid  = deep night
+        skyColorsNightEdge = the edges of night (toward dusk/dawn)
+
+      The xpath has no [defName="..."] predicate, so it matches EVERY WeatherDef
+      that declares these blocks, and PatchOperationReplace applies to every match.
+      We replace only the sky node (the brightness/tint), leaving each weather's
+      own shadow / overlay / saturation intact.
+
+      Values are (R,G,B) 0..1. Lower = darker. Slight blue bias for a night feel.
+      Tune by eye; this is just a dark starting point.
+    -->
+
+    <Operation Class="PatchOperationReplace">
+        <xpath>/Defs/WeatherDef/skyColorsNightMid/sky</xpath>
+        <value>
+            <sky>(0.05,0.05,0.09)</sky>
+        </value>
+    </Operation>
+
+    <Operation Class="PatchOperationReplace">
+        <xpath>/Defs/WeatherDef/skyColorsNightEdge/sky</xpath>
+        <value>
+            <sky>(0.05,0.05,0.09)</sky>
+        </value>
+    </Operation>
+
+</Patch>
