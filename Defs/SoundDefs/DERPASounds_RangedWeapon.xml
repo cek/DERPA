@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+    <!-- Example sound: saw launcher firing -->
+    <SoundDef>
+
+        <!-- defNames must be unique across all mods -->
+        <!-- It's generally recommended that you prefix it with your mod name to prevent mod collisions -->
+        <defName>DERPA_SawLauncher</defName>
+
+        <!-- Specifies that this sound should only play while the player is looking at the tile map -->
+        <!-- Other possible values are "WorldOnly" for the world map and "Any" for either. -->
+        <context>MapOnly</context>
+
+        <!-- A single SoundDef can trigger more than one sound. -->
+        <!-- All subSounds will be played every time this SoundDef is triggered. -->
+        <subSounds>
+            <li>
+                <!-- A random grain will be chosen each time this subSound is played. -->
+                <!-- AudioGrain_Clip links to a single sound file,
+                     while AudioGrain_Folder will randomly select a sound from a folder -->
+                <grains>
+                    <li Class="AudioGrain_Clip">
+                        <clipPath>DERPA/SawLaunch</clipPath>
+                    </li>
+                </grains>
+                <!-- This subSound will randomly select a volume in this range every time it's played. -->
+                <volumeRange>40~45</volumeRange>
+                <!-- This subSound will randomly pitch-shift within the specified range every time it's played. -->
+                <pitchRange>0.8940217~1.084783</pitchRange>
+                <!-- Varying your volumeRange and pitchRange can emulate having more sound samples
+                     than you actually have and prevent your sound effects from sounding too repetitive. -->
+            </li>
+        </subSounds>
+
+    </SoundDef>
+
+    <!-- Example sound: saw launcher melee -->
+    <SoundDef>
+
+        <defName>DERPA_SawLauncherMelee</defName>
+        <context>MapOnly</context>
+        <subSounds>
+            <li>
+                <grains>
+                    <li Class="AudioGrain_Clip">
+                        <clipPath>DERPA/SawMelee</clipPath>
+                    </li>
+                </grains>
+                <volumeRange>45~50</volumeRange>
+                <pitchRange>0.8940217~1.084783</pitchRange>
+            </li>
+        </subSounds>
+
+    </SoundDef>
+
+</Defs>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+    <!-- DERPA damage type: ranged cut -->
+    <!-- We are inheriting from the vanilla Arrow damage type for convenience -->
+    <DamageDef ParentName="Arrow">
+
+        <!-- defNames must be unique across all mods -->
+        <!-- It's generally recommended that you prefix it with your mod name to prevent mod collisions -->
+        <defName>DERPADamage_Saw</defName>
+
+        <!-- This is the display name of the damage type. It should be lowercase unless it's a proper name -->
+        <!-- Labels will get automatically capitalized by RimWorld's grammar resolver if necessary -->
+        <label>saw</label>
+
+        <!-- This is the combat log message shown when a pawn is killed by this damage type -->
+        <deathMessage>{0} has been sliced to death by a saw blade.</deathMessage>
+    </DamageDef>
+
+</Defs>

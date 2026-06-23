@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+    <!-- Example weapon: saw launcher -->
+    <ThingDef ParentName="BaseHumanMakeableGun">
+
+        <!-- defNames must be unique across all mods -->
+        <!-- It's generally recommended that you prefix it with your mod name to prevent mod collisions -->
+        <defName>DERPAGun_SawLauncher</defName>
+
+        <!-- This is the display name of the weapon. It should be lowercase unless it's a proper name -->
+        <!-- Labels will get automatically capitalized by RimWorld's grammar resolver if necessary -->
+        <label>saw launcher</label>
+
+        <!-- The full description of this weapon. It is seen by players when inspecting the full stat card -->
+        <description>A heavy industrial circular saw used for both construction and demolition.\n\nSome madman has modified this tool to allow its blades to be shot out at high velocity, rendering it a short-ranged but devastating weapon.</description>
+
+        <!-- Allows this weapon to be used by pawn backstories as a starting possession -->
+        <possessionCount>1</possessionCount>
+
+        <!-- Sets the item graphic for this ThingDef -->
+        <!-- For ranged weapons, this will be used as the equipped texture as well -->
+        <graphicData>
+            <texPath>DERPA/SawLauncher</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+
+        <!-- Sets the sounds that plays when a colonist picks up this weapon -->
+        <soundInteract>DERPAWeapon_SawLauncherMelee</soundInteract>
+
+        <!-- Weapon classes are broad categories of weapons that are used by both Ideology precepts and Biotech xenotypes in order to determine liked or disliked weapons. -->
+        <!-- In our case, we will use the same weapon class as vanilla shotguns as our weapon is a devastating short-ranged projectile weapon. -->
+        <weaponClasses>
+            <li>ShortShots</li>
+        </weaponClasses>
+
+        <!-- Allows this item to be generated on NPCs -->
+        <!-- As with our weapon class, we will allow this weapon to spawn on any PawnKind that would normally use shotguns. -->
+        <weaponTags>
+            <li>ShortShots</li>
+        </weaponTags>
+
+        <!-- Determines base stats for this item -->
+        <statBases>
+            <WorkToMake>15000</WorkToMake>
+            <Mass>9.9</Mass>
+            <AccuracyTouch>0.85</AccuracyTouch>
+            <AccuracyShort>0.80</AccuracyShort>
+            <AccuracyMedium>0.70</AccuracyMedium>
+            <AccuracyLong>0.56</AccuracyLong>
+            <RangedWeapon_Cooldown>1.8</RangedWeapon_Cooldown>
+        </statBases>
+
+        <!-- Determines stat modifiers given to the pawn that equips this item -->
+        <equippedStatOffsets>
+            <ConstructionSpeed>0.10</ConstructionSpeed>
+        </equippedStatOffsets>
+
+        <!-- Determines the materials required to craft this weapon -->
+        <costList>
+            <Steel>80</Steel>
+            <ComponentIndustrial>4</ComponentIndustrial>
+        </costList>
+
+        <!-- Determines values used to create the recipe for this item -->
+        <!-- Many required fields are inherited from the parent "BaseHumanMakeableGun" -->
+        <recipeMaker>
+            <skillRequirements>
+                <Crafting>5</Crafting>
+            </skillRequirements>
+            <!-- Immediately after the vanilla chain shotgun at 435 -->
+            <displayPriority>436</displayPriority>
+        </recipeMaker>
+
+        <!-- A weapon's verbs determine its ranged attacks -->
+        <!-- Vanilla RimWorld only supports a single ranged verb, but mods exist that allow more than one ranged attack per weapon -->
+        <verbs>
+            <li>
+                <!-- The C# handler class for this attack -->
+                <!-- Most firearms should use Verb_Shoot, which will utilize the Shooting skill -->
+                <verbClass>Verb_Shoot</verbClass>
+
+                <!-- If true, will create a "Shoot" command on the pawn's hotbar -->
+                <!-- This should always be true unless you are generating a shoot command yourself via custom code -->
+                <hasStandardCommand>true</hasStandardCommand>
+
+                <!-- This determines what projectile is fired by this attack -->
+                <!-- It needs to be assigned the defName of a projectile ThingDef -->
+                <defaultProjectile>DERPABullet_SawBlade</defaultProjectile>
+
+                <!-- This is the time required to aim this attack at an enemy before it will fire -->
+                <warmupTime>0.2</warmupTime>
+
+                <!-- This is the range of this attack -->
+                <!-- Most ranges should end in .9 in order to keep in sync with the range circle drawing system -->
+                <range>18.9</range>
+
+                <!-- This is the sound played when this attack successfully fires -->
+                <soundCast>DERPAWeapon_SawLauncher</soundCast>
+                <soundCastTail>GunTail_Heavy</soundCastTail>
+
+                <!-- There is no muzzle flash for the saw launcher since it's not a firearm -->
+                <muzzleFlashScale>0</muzzleFlashScale>
+            </li>
+        </verbs>
+
+        <!-- Determines the melee attacks that are available when this weapon is equipped -->
+        <tools>
+            <li>
+                <label>handle</label>
+                <capacities>
+                    <li>Blunt</li>
+                </capacities>
+                <power>9</power>
+                <cooldownTime>1</cooldownTime>
+            </li>
+            <li>
+                <label>blade</label>
+                <capacities>
+                    <li>Demolish</li>
+                </capacities>
+                <power>13</power>
+                <cooldownTime>1</cooldownTime>
+
+                <!-- Overrides the sounds made when a melee attack based on this tool hits or misses -->
+                <soundMeleeHit>DERPAWeapon_SawLauncherMelee</soundMeleeHit>
+                <soundMeleeMiss>DERPAWeapon_SawLauncher</soundMeleeMiss>
+            </li>
+        </tools>
+    </ThingDef>
+
+    <!-- Example projectile: saw blade -->
+    <ThingDef ParentName="BaseBullet">
+        <defName>DERPABullet_SawBlade</defName>
+        <label>saw blade</label>
+
+        <!-- The texture specified for a projectile is used purely for its appearance while in flight -->
+        <graphicData>
+            <texPath>DERPA/SawBlade</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+
+        <projectile>
+            <!-- This determines the type of damage this projectile inflicts on impact -->
+            <!-- We are using our custom damage type defined in DERPADamage_Ranged.xml -->
+            <damageDef>DERPADamage_Saw</damageDef>
+
+            <!-- This is the base damage inflicted by this projectile -->
+            <!-- The final damage value will be altered by weapon quality, armor, and various other factors -->
+            <damageAmountBase>2500</damageAmountBase>
+
+            <!-- Pawn targets hit by this projectile with a body size smaller than its stopping power will be staggered on impact -->
+            <stoppingPower>1.5</stoppingPower>
+
+            <!-- An amount of armor equal to a weapon's armor penetration is ignored when calculating final damage -->
+            <!-- Just like base damage, it will be altered by weapon quality and other factors -->
+            <armorPenetrationBase>0.49</armorPenetrationBase>
+
+            <!-- This is the speed of the projectile, with a speed of 100 equating to 1 tile per tick -->
+            <!-- Speeds of over 100 can cause collision detection glitches -->
+            <speed>55</speed>
+        </projectile>
+    </ThingDef>
+
+</Defs>
