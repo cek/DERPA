@@ -1,6 +1,7 @@
 using HarmonyLib;
 using UnityEngine;
 using Verse;
+using System;
 using System.Reflection;
 
 namespace DERPA
@@ -18,27 +19,25 @@ namespace DERPA
     [HarmonyPatch(typeof(SectionLayer_LightingOverlay), "Regenerate")]
     public static class DarkenLightingOverlay
     {
-        // The lighting overlay's vertex alpha is "how much darkness to paint":
-        //   0   = fully bright (e.g. sunlit daytime)
-        //   255 = fully dark
+        // Reshape the overlay's alpha (darkness) so unlit areas go dark AND a lamp's
+        // edge fades in instead of cutting hard.
         //
-        // We remap the alpha value so full-bright is preserved, but dim areas go darker.
+        // Each vertex: RGB = lamp light colour, alpha = darkness (0 bright .. 255 black).
+        // Glow renders near-binary (on/off), but ALPHA renders continuously -- so we
+        // grade in alpha, keyed on glow:
+        //   glow >= SoftMax (bright core) -> vanilla (untouched)
+        //   glow == 0       (unlit)       -> remap alpha (DarkAlpha floor -> MaxAlpha)
+        //   in between      (lamp edge)   -> blend, so brightness ramps down to the edge
+        // This DOES darken dim lit cells (sim > 0) -- accepted, to soften the border.
+        // Daytime stays bright: sunlit cells have alpha ~ 0, and 0 * anything = 0.
         //
-        // First, we look up the alpha value that is used over roofed, unlit tiles.
-        // We store this value in DarkAlpha.
-        //
-        // Then we remap so that alpha 0 stays at 0, but DarkAlpha maps to 255 (full dark).
-        // The max value is clamped to 255.
-        //
-        //   alpha 0 -> 0  (sun-lit cells untouched)
-        //   alpha >= DarkAlpha -> 255 (unlit indoor cell becomes black)
-        //
-        // Read the game's own roofed-area darkness floor
-        // (SectionLayer_LightingOverlay.RoofedAreaMinSkyCover).
-        // Cached once; falls back to 100 if a future version renames or removes the field.
+        // DarkAlpha is the game's own roofed-area floor
+        // (SectionLayer_LightingOverlay.RoofedAreaMinSkyCover); read once, falls back
+        // to 100 if a future version renames or removes the field.
 
         static readonly float DarkAlpha = ReadRoofedAlphaFloor();
         static readonly float MaxAlpha = 255f;
+        const int SoftMax = 128;   // glow at/above which a cell is "fully lit" (untouched)
 
         static float ReadRoofedAlphaFloor()
         {
@@ -59,10 +58,14 @@ namespace DERPA
             if (subMesh?.mesh?.colors32 == null) return;
 
             var colors = subMesh.mesh.colors32;
+            float scale = MaxAlpha / DarkAlpha;
             for (int i = 0; i < colors.Length; i++)
             {
-                int remapped = Mathf.RoundToInt(colors[i].a * (MaxAlpha / DarkAlpha));
-                colors[i].a = (byte)Mathf.Min(255, remapped);
+                int maxRGB = Mathf.Max(colors[i].r, Mathf.Max(colors[i].g, colors[i].b));
+                // t: 1 = fully lit (vanilla) .. 0 = unlit (full dark), ramped over [0, SoftMax].
+                float t = maxRGB >= SoftMax ? 1f : maxRGB / (float)SoftMax;
+                int darkened = Mathf.Min(255, Mathf.RoundToInt(colors[i].a * scale));
+                colors[i].a = (byte)Mathf.RoundToInt(Mathf.Lerp(darkened, colors[i].a, t));
             }
             subMesh.mesh.colors32 = colors;
         }
