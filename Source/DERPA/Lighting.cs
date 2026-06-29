@@ -50,6 +50,9 @@ namespace DERPA
 
         static void Postfix(SectionLayer __instance)
         {
+            var s = DERPAMod.Settings;
+            if (s != null && !s.darknessEnabled) return;
+
             var getSubMesh = AccessTools.Method(typeof(SectionLayer), "GetSubMesh",
                 new[] { typeof(Material) });
             var subMesh = (LayerSubMesh)getSubMesh.Invoke(__instance,
